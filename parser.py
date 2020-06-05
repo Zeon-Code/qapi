@@ -1,6 +1,6 @@
 
 
-END = 'end'
+END = "end"
 
 
 class Operation:
@@ -11,21 +11,17 @@ class Operation:
 class Parser:
 
     states = {
-        'filter': {
-            '[where]': {
-                '[and]': {
-                    '[{integer}]': {
-                        '{condition}': END
-                    }
-                },
-                '[or]': {
-                    '[{integer}]': {
-                        '{condition}': END
-                    }
-                },
-                '{condition}': END
-            }
-        }
+        "initial": {"filter"},
+        "filter": {"[where]", "[order]"},
+
+        "[order]": {"{integer:order}"},
+        "{integer:order}": {END},
+
+        "[where]": {"{logical_operator:where}", "{constraint:where}"},
+        "{logical_operator:where}": {"{integer:where}"},
+        "{integer:where}": {"{constraint:where}"},
+        "{constraint:where}": {"{relational_operator}", END},
+        "{relational_operator}": {END}
     }
 
     def parse(self, querstring):
@@ -43,60 +39,51 @@ class Parser:
         segments = []
 
         while raw:
-            match_index = raw.find('[', 1)
+            match_index = raw.find("[", 1)
             if match_index > 0:
                 segments.append(raw[:match_index])
                 raw = raw[match_index:]
                 continue
 
             segments.append(raw)
-            raw = ''
+            raw = ""
         return segments
 
     def _validate_segments(self, segments):
-        segment_index = 0
-        context = self.states
- 
-        while context != END:
-            is_valid = False
-            segment = segments[segment_index]
-
-            if segment in context:
-                context = context[segment]
-                segment_index += 1
-                continue
-            
-            for dynamic_segment_name, dynamic_segment_key in self._get_dynamic_segment(context):
-                validator = getattr(self, f"_validate_dynamic_{dynamic_segment_name}", None)
-                if validator(segment, segment_index, segments):
-                    context = context[dynamic_segment_key]
-                    is_valid = True
-                    break
-
-            if not is_valid:
+        previous_state = "initial"
+        for segment in segments:
+            state = self._get_state(previous_state, segment)
+            if state not in self.states or state not in self.states[previous_state]:
                 return False
+            previous_state = state
+        return END in self.states[previous_state]
 
-            segment_index += 1
-        return True
-    
-    def _get_dynamic_segment(self, context):
-        dynamic_segments = []
-        for key in context.keys():
-            name = key[1:-1] if key.startswith('[') and key.endswith(']') else key
-            if name.startswith('{') and name.endswith('}'):
-                dynamic_segments.append((name[1:-1], key))
-        return dynamic_segments
+    def _get_state(self, previous_state, segment):
+        return segment if segment in self.states else self._get_dynamic_state(previous_state, segment)
 
-    def _validate_dynamic_integer(self, segment, index, segments):
+    def _get_dynamic_state(self, previous_state, segment):
+        text = segment[1:-1] if segment.startswith("[") and segment.endswith("]") else segment
+        for state in self.states[previous_state]:
+            space_name = state[1:-1] if state.startswith("{") and state.endswith("}") else state
+            validator_name = space_name.split(':')[0] if space_name.find(':') else space_name
+            validator = getattr(self, f"_is_valid_{validator_name}_state", None)
+            if validator and validator(text):
+                return state
+
+    def _is_valid_logical_operator_state(self, text):
+        return text in {"and", "or"}
+
+    def _is_valid_relational_operator_state(self, text):
+        return text in {"eq", "gt", "lt", "gte", "lte", "like", "nlike", "inq"}
+
+    def _is_valid_integer_state(self, text):
         try:
-            text = segment[1:-1] if segment.startswith('[') and segment.endswith(']') else segment
             int(text)
-            return True
         except ValueError:
             return False
+        return True
 
-    def _validate_dynamic_condition(self, segment, index, segments):
-        text = segment[1:-1] if segment.startswith('[') and segment.endswith(']') else segment
-        if len(text.split('.')) == 2:
+    def _is_valid_constraint_state(self, text):
+        if len(text.split(".")) == 2:
             return True
         return False
