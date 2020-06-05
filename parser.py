@@ -8,6 +8,37 @@ class Operation:
         self._segments = segments
 
 
+class DynamicValidation:
+    @classmethod
+    def is_valid_state(cls, state, text):
+        dynamic_state_name = state[1:-1]
+        validator_name = dynamic_state_name.split(':')[0] if dynamic_state_name.find(':') else dynamic_state_name
+        validator = getattr(cls, f"is_valid_{validator_name}_state", None)
+        return validator and validator(text)
+
+    @classmethod
+    def is_valid_logical_operator_state(cls, text):
+        return text in {"and", "or"}
+
+    @classmethod
+    def is_valid_relational_operator_state(cls, text):
+        return text in {"eq", "gt", "lt", "gte", "lte", "like", "nlike", "inq"}
+
+    @classmethod
+    def is_valid_integer_state(cls, text):
+        try:
+            int(text)
+        except ValueError:
+            return False
+        return True
+
+    @classmethod
+    def is_valid_constraint_state(cls, text):
+        if len(text.split(".")) == 2:
+            return True
+        return False
+
+
 class Parser:
 
     states = {
@@ -64,26 +95,5 @@ class Parser:
     def _get_dynamic_state(self, previous_state, segment):
         text = segment[1:-1] if segment.startswith("[") and segment.endswith("]") else segment
         for state in self.states[previous_state]:
-            space_name = state[1:-1] if state.startswith("{") and state.endswith("}") else state
-            validator_name = space_name.split(':')[0] if space_name.find(':') else space_name
-            validator = getattr(self, f"_is_valid_{validator_name}_state", None)
-            if validator and validator(text):
+            if DynamicValidation.is_valid_state(state, text):
                 return state
-
-    def _is_valid_logical_operator_state(self, text):
-        return text in {"and", "or"}
-
-    def _is_valid_relational_operator_state(self, text):
-        return text in {"eq", "gt", "lt", "gte", "lte", "like", "nlike", "inq"}
-
-    def _is_valid_integer_state(self, text):
-        try:
-            int(text)
-        except ValueError:
-            return False
-        return True
-
-    def _is_valid_constraint_state(self, text):
-        if len(text.split(".")) == 2:
-            return True
-        return False
