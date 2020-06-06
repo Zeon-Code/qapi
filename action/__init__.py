@@ -6,6 +6,9 @@ class Action:
     def context(self):
         raise NotImplementedError()
 
+    def copy(self):
+        raise NotImplementedError()
+
     def _parse_constraint(self, constraint):
         return self._get_text(constraint).split(".")
 

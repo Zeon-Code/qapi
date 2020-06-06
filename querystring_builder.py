@@ -7,14 +7,18 @@ class QueryStringBuilder:
         self.state_machine = QuerystringStateMachine()
 
     def parse(self, querstring):
-        group = ActionGroup()
+        grouped_actions = ActionGroup()
+        self.state_machine.pre_process(grouped_actions)
+
         for _key, value in querstring.items():
             key = _key.lower()
             segments = self._segment_key(key)
             segments.append(value)
             if self._validate_segments(segments):
-                group.add(get_action(segments))
-        return group
+                grouped_actions.add(get_action(segments))
+
+        self.state_machine.post_process(grouped_actions)
+        return grouped_actions
 
     def _segment_key(self, key):
         raw = key

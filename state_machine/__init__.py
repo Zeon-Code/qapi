@@ -14,4 +14,10 @@ class StateMachine:
     def get_state(self, previous_state, segment):
         raise NotImplementedError()
 
+    def pre_process(self, grouped_actions):
+        pass
+
+    def post_process(self, grouped_actions):
+        pass
+
 from state_machine.querystring import QuerystringStateMachine

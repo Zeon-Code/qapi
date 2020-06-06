@@ -189,6 +189,24 @@ class QueryStringBuilderTestCase(TestCase):
         group = self.builder.parse(querystring)
         self.assertEqual(1, group.total)
 
+    def test_assemble_constraint_where_relational_operator_inq(self):
+        """inq operator is assembled into one action with multiples values"""
+        querystring = {
+            "filter[where][or][0][table.column1][inq]": "value1",
+            "filter[where][or][0][table.column1][inq]": "value2"
+        }
+        group = self.builder.parse(querystring)
+        self.assertEqual(1, group.total)
+
+    def test_not_assemble_different_constraint_where_relational_operator_inq(self):
+        """inq operator is assembled into one action with multiples values"""
+        querystring = {
+            "filter[where][or][0][table.column1][inq]": "value1",
+            "filter[where][or][0][table.column2][inq]": "value2"
+        }
+        group = self.builder.parse(querystring)
+        self.assertEqual(2, group.total)
+
     def test_where_relational_operator_inq_with_logical_operator_and(self):
         querystring = {
             "filter[where][and][0][table.column1][inq]": "value1",
