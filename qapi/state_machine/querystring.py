@@ -2,7 +2,7 @@ from collections import defaultdict
 
 from qapi.state_machine import END, StateMachine
 
-#TODO: Unit test covering all scenarios
+
 class QuerystringStateValidation:
     def is_valid_value_state(self, text):
         return True
