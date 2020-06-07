@@ -6,6 +6,7 @@ class QueryStringBuilder:
     def __init__(self):
         self.state_machine = QuerystringStateMachine()
 
+    #TODO: do not overwrite key (key = _key.lower())
     def parse(self, querstring):
         grouped_actions = ActionGroup()
         self.state_machine.pre_process(grouped_actions)

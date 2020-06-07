@@ -75,7 +75,7 @@ class SQLAlchemyTestCase(TestCase):
         self.assertEqual({"where": ["user.name >= 'Igor'"], "order": []}, self._translate())
 
     def test_where_action_operator_inq(self):
-        """Assemble inq operator"""
+        """Merge inq operator"""
         where_action = WhereAction(["[user.name]", "[inq]", ["Igor", "Fernando"]])
         self.grouped_action.add(where_action)
 

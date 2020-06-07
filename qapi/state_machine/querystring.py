@@ -61,7 +61,7 @@ class QuerystringStateMachine(StateMachine):
             return
 
         for actions in list(where_actions):
-            self._assemble_inq_operator(actions, grouped_actions)
+            self._merge_inq_operator(actions, grouped_actions)
 
     def get_state(self, previous_state, segment):
         return segment if segment in self.states else self._get_dynamic_state(previous_state, segment)
@@ -78,7 +78,7 @@ class QuerystringStateMachine(StateMachine):
         validator = getattr(self.state_validator, f"is_valid_{validator_name}_state", None)
         return validator and validator(text)
 
-    def _assemble_inq_operator(self, actions, grouped_actions):
+    def _merge_inq_operator(self, actions, grouped_actions):
         filtered_actions = defaultdict(list)
         for action in actions:
             key = f"{action.model}_{action.property}"
