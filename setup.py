@@ -15,6 +15,11 @@ setuptools.setup(
     install_requires=[
           'sqlalchemy',
     ],
+    extras_require={
+        "test": [
+            "pytest"
+        ]
+    },
     packages=setuptools.find_packages(),
     keywords=["qapi", "API", "Query Language"],
     classifiers=[

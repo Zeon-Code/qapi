@@ -1,10 +1,10 @@
 .PHONY: test
 
 setup:
-	@pip install .
+	@pip install ".[tests]"
 
 test:
-	@python -B -m unittest discover test
+	@pytest -p no:cacheprovider
 
 release:
 	@python setup.py sdist bdist_wheel
