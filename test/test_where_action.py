@@ -1,7 +1,7 @@
 
 from unittest import TestCase
 
-from action import WhereAction
+from qapi.action import WhereAction
 
 
 class WhereActionTestCase(TestCase):

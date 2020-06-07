@@ -1,6 +1,6 @@
 from collections import defaultdict
 
-from state_machine import END, StateMachine
+from qapi.state_machine import END, StateMachine
 
 #TODO: Unit test covering all scenarios
 class QuerystringStateValidation:

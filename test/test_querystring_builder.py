@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from querystring_builder import QueryStringBuilder
+from qapi.querystring_builder import QueryStringBuilder
 
 
 class QueryStringBuilderTestCase(TestCase):

@@ -3,8 +3,8 @@ from unittest import TestCase
 from sqlalchemy import Table, MetaData, Column, Integer, String
 from sqlalchemy.dialects import mysql
 
-from dialect import SQLAlchemyDialect, NotRegisteredTable
-from action import WhereAction, OrderAction, ActionGroup
+from qapi.dialect import SQLAlchemyDialect, NotRegisteredTable
+from qapi.action import WhereAction, OrderAction, ActionGroup
 
 
 user = Table(

@@ -19,9 +19,9 @@ class Action:
         return segment[1:-1] if segment.startswith("[") and segment.endswith("]") else segment
 
 
-from action.order import OrderAction
-from action.where import WhereAction
-from action.group import ActionGroup
+from qapi.action.order import OrderAction
+from qapi.action.where import WhereAction
+from qapi.action.group import ActionGroup
 
 
 def get_action(_segments):

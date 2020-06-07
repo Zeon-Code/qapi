@@ -1,4 +1,4 @@
-from action import Action
+from qapi.action import Action
 
 
 class OrderAction(Action):

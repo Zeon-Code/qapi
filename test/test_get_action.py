@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from action import get_action, WhereAction, OrderAction
+from qapi.action import get_action, WhereAction, OrderAction
 
 
 class GetActionTestCase(TestCase):

@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from state_machine import QuerystringStateMachine
+from qapi.state_machine import QuerystringStateMachine
 
 
 class QuerystringStateMachineTestCase(TestCase):

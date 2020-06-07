@@ -1,5 +1,5 @@
-from action import get_action, ActionGroup
-from state_machine import END, QuerystringStateMachine
+from qapi.action import get_action, ActionGroup
+from qapi.state_machine import END, QuerystringStateMachine
 
 
 class QueryStringBuilder:

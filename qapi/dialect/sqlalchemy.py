@@ -1,6 +1,6 @@
 from sqlalchemy import and_, or_
 
-from dialect import Dialect
+from qapi.dialect import Dialect
 
 
 class NotRegisteredTable(Exception):

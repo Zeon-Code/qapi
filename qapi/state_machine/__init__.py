@@ -20,4 +20,4 @@ class StateMachine:
     def post_process(self, grouped_actions):
         pass
 
-from state_machine.querystring import QuerystringStateMachine
+from qapi.state_machine.querystring import QuerystringStateMachine
