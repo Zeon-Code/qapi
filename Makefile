@@ -1,7 +1,7 @@
 .PHONY: test
 
 setup:
-	@pip install ".[tests]"
+	@pip install -e ".[tests]"
 
 test:
 	@pytest -p no:cacheprovider
