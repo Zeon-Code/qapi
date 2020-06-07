@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="qapi",
-    version="0.0.1",
+    version="0.0.2",
     author="Diego Peres",
     author_email="speres.diego@gmail.com",
     description="QAPI - API query language",
