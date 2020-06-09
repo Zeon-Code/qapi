@@ -35,13 +35,16 @@ class QuerystringStateValidation:
         return False
 
 
+#TODO: Implement properly include actions
 class QuerystringStateMachine(StateMachine):
 
     state_validator = QuerystringStateValidation()
 
     states = {
         "initial": ["filter"],
-        "filter": ["[where]", "[order]"],
+        "filter": ["[where]", "[order]", "[include]"],
+
+        "[include]": ["{value}"],
 
         "[order]": ["{integer:order}"],
         "{integer:order}": ["{order_value}"],
@@ -52,6 +55,7 @@ class QuerystringStateMachine(StateMachine):
         "{integer:where}": ["{constraint:where}"],
         "{constraint:where}": ["{relational_operator:where}", "{value}"],
         "{relational_operator:where}": ["{value}"],
+
         "{value}": [END]
     }
 

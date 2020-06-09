@@ -227,3 +227,8 @@ class QueryStringBuilderTestCase(TestCase):
         querystring = {"filter[order][0]": "table.column asc"}
         group = self.builder.parse(querystring)
         self.assertEqual(1, group.total)
+
+    def test_include(self):
+        querystring = {"filter[include]": "table"}
+        group = self.builder.parse(querystring)
+        self.assertEqual(1, group.total)

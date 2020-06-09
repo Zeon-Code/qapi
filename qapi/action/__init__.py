@@ -21,6 +21,7 @@ class Action:
 
 from qapi.action.order import OrderAction
 from qapi.action.where import WhereAction
+from qapi.action.include import IncludeAction
 from qapi.action.group import ActionGroup
 
 
@@ -32,3 +33,5 @@ def get_action(_segments):
         return OrderAction(segments)
     elif _type == "filter" and command == "[where]":
         return WhereAction(segments)
+    elif _type == "filter" and command == "[include]":
+        return IncludeAction(segments)
