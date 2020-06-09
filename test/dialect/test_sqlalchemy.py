@@ -4,7 +4,7 @@ from sqlalchemy import Table, MetaData, Column, Integer, String
 from sqlalchemy.dialects import mysql
 
 from qapi.dialect import SQLAlchemyDialect, NotRegisteredTable
-from qapi.action import WhereAction, OrderAction, ActionGroup
+from qapi.action import WhereAction, OrderAction, ActionGroup, IncludeAction
 
 
 user = Table(
@@ -38,60 +38,66 @@ class SQLAlchemyTestCase(TestCase):
 
         self.assertRaises(AttributeError, self.dialect.translate, self.grouped_action.actions)
 
+    def test_include_action(self):
+        include_action = IncludeAction(["user"])
+        self.grouped_action.add(include_action)
+
+        self.assertEqual({"where": [], "order": [], "include":["user"]}, self._translate())
+
     def test_order_action(self):
         order_action = OrderAction(["[0]", "user.id asc"])
         self.grouped_action.add(order_action)
 
-        self.assertEqual({"where": [], "order": ["user.id ASC"]}, self._translate())
+        self.assertEqual({"where": [], "order": ["user.id ASC"], "include": []}, self._translate())
 
     def test_where_action_operator_eq(self):
         where_action = WhereAction(["[user.name]", "[eq]", "Igor"])
         self.grouped_action.add(where_action)
 
-        self.assertEqual({"where": ["user.name = 'Igor'"], "order": []}, self._translate())
+        self.assertEqual({"where": ["user.name = 'Igor'"], "order": [], "include": []}, self._translate())
 
     def test_where_action_operator_lt(self):
         where_action = WhereAction(["[user.name]", "[lt]", "Igor"])
         self.grouped_action.add(where_action)
 
-        self.assertEqual({"where": ["user.name < 'Igor'"], "order": []}, self._translate())
+        self.assertEqual({"where": ["user.name < 'Igor'"], "order": [], "include": []}, self._translate())
 
     def test_where_action_operator_lte(self):
         where_action = WhereAction(["[user.name]", "[lte]", "Igor"])
         self.grouped_action.add(where_action)
 
-        self.assertEqual({"where": ["user.name <= 'Igor'"], "order": []}, self._translate())
+        self.assertEqual({"where": ["user.name <= 'Igor'"], "order": [], "include": []}, self._translate())
 
     def test_where_action_operator_gt(self):
         where_action = WhereAction(["[user.name]", "[gt]", "Igor"])
         self.grouped_action.add(where_action)
 
-        self.assertEqual({"where": ["user.name > 'Igor'"], "order": []}, self._translate())
+        self.assertEqual({"where": ["user.name > 'Igor'"], "order": [], "include": []}, self._translate())
 
     def test_where_action_operator_gte(self):
         where_action = WhereAction(["[user.name]", "[gte]", "Igor"])
         self.grouped_action.add(where_action)
 
-        self.assertEqual({"where": ["user.name >= 'Igor'"], "order": []}, self._translate())
+        self.assertEqual({"where": ["user.name >= 'Igor'"], "order": [], "include": []}, self._translate())
 
     def test_where_action_operator_inq(self):
         """Merge inq operator"""
         where_action = WhereAction(["[user.name]", "[inq]", ["Igor", "Fernando"]])
         self.grouped_action.add(where_action)
 
-        self.assertEqual({"where": ["user.name IN ('Igor', 'Fernando')"], "order": []}, self._translate())
+        self.assertEqual({"where": ["user.name IN ('Igor', 'Fernando')"], "order": [], "include": []}, self._translate())
 
     def test_where_action_operator_like(self):
         where_action = WhereAction(["[user.name]", "[like]", "%Igor%"])
         self.grouped_action.add(where_action)
 
-        self.assertEqual({"where": ["user.name LIKE '%%Igor%%'"], "order": []}, self._translate())
+        self.assertEqual({"where": ["user.name LIKE '%%Igor%%'"], "order": [], "include": []}, self._translate())
 
     def test_where_action_operator_nlike(self):
         where_action = WhereAction(["[user.name]", "[nlike]", "%Igor%"])
         self.grouped_action.add(where_action)
 
-        self.assertEqual({"where": ["user.name NOT LIKE '%%Igor%%'"], "order": []}, self._translate())
+        self.assertEqual({"where": ["user.name NOT LIKE '%%Igor%%'"], "order": [], "include": []}, self._translate())
 
     def test_where_action_logical_operator_and(self):
         where_action1 = WhereAction(["[and]", "[0]", "[user.name]", "Igor"])
@@ -99,7 +105,7 @@ class SQLAlchemyTestCase(TestCase):
         self.grouped_action.add(where_action1)
         self.grouped_action.add(where_action2)
 
-        self.assertEqual({"where": ["user.name = 'Igor' AND user.email = 'igor@email.com'"], "order": []}, self._translate())
+        self.assertEqual({"where": ["user.name = 'Igor' AND user.email = 'igor@email.com'"], "order": [], "include": []}, self._translate())
 
     def test_where_action_logical_operator_or(self):
         where_action1 = WhereAction(["[or]", "[0]", "[user.name]", "Igor"])
@@ -107,7 +113,7 @@ class SQLAlchemyTestCase(TestCase):
         self.grouped_action.add(where_action1)
         self.grouped_action.add(where_action2)
 
-        self.assertEqual({"where": ["user.name = 'Igor' OR user.name = 'Fernando'"], "order": []}, self._translate())
+        self.assertEqual({"where": ["user.name = 'Igor' OR user.name = 'Fernando'"], "order": [], "include": []}, self._translate())
 
     def test_where_action_logical_operator_or(self):
         where_action1 = WhereAction(["[or]", "[0]", "[user.name]", "Igor"])
@@ -115,7 +121,7 @@ class SQLAlchemyTestCase(TestCase):
         self.grouped_action.add(where_action1)
         self.grouped_action.add(where_action2)
 
-        self.assertEqual({"where": ["user.name = 'Igor' OR user.name = 'Fernando'"], "order": []}, self._translate())
+        self.assertEqual({"where": ["user.name = 'Igor' OR user.name = 'Fernando'"], "order": [], "include": []}, self._translate())
 
     def test_sort_where_action(self):
         where_action1 = WhereAction(["[and]", "[1]", "[user.name]", "Igor"])
@@ -132,7 +138,8 @@ class SQLAlchemyTestCase(TestCase):
                 "user.name = 'Fernando' AND user.email = 'fernando@email.com'", 
                 "user.name = 'Igor' AND user.email = 'igor@email.com'"
             ], 
-            "order": []
+            "order": [],
+            "include": []
         }, self._translate())
 
     def test_sort_order_action(self):
@@ -143,14 +150,15 @@ class SQLAlchemyTestCase(TestCase):
         self.grouped_action.add(order_action2)
         self.grouped_action.add(order_action3)
 
-        self.assertEqual({"where": [], "order": ["user.email DESC", "user.id ASC", "user.name ASC"]}, self._translate())
+        self.assertEqual({"where": [], "order": ["user.email DESC", "user.id ASC", "user.name ASC"], "include": []}, self._translate())
 
     def _translate(self):
         sql_expressions = self.dialect.translate(self.grouped_action.actions)
 
         return {
             "where": [self._render_expression(expression) for expression in sql_expressions["where"]],
-            "order": [self._render_expression(expression) for expression in sql_expressions["order"]]
+            "order": [self._render_expression(expression) for expression in sql_expressions["order"]],
+            "include": [table.name for table in sql_expressions["include"]]
         }
 
     def _render_expression(self, expression):

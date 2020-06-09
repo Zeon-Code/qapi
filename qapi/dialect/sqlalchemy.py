@@ -15,12 +15,14 @@ class SQLAlchemyDialect(Dialect):
         self._tables[table.name] = table
     
     def translate(self, grouped_action):
+        include_actions = grouped_action.get("include", {}).values()
         sorted_grouped_where = sorted(grouped_action.get("where", {}).values(), key=lambda actions: actions[0].index)
         sorted_grouped_order = sorted(grouped_action.get("order", {}).values(), key=lambda actions: actions[0].index)
 
         return {
             "where": self._translate_where(sorted_grouped_where),
-            "order": self._translate_order(sorted_grouped_order)
+            "order": self._translate_order(sorted_grouped_order),
+            "include": self._translate_include(include_actions)
         }
 
     def _translate_where(self, sorted_where):
@@ -40,6 +42,13 @@ class SQLAlchemyDialect(Dialect):
         return [
             self._translate_order_action(action)
             for actions in sorted_order 
+            for action in actions
+        ]
+
+    def _translate_include(self, include_actions):
+        return [
+            self._tables.get(action.model)
+            for actions in include_actions
             for action in actions
         ]
 
