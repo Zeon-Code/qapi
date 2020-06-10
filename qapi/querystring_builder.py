@@ -7,11 +7,10 @@ class QueryStringBuilder:
         self.state_machine = QuerystringStateMachine()
 
     #TODO: do not overwrite key (key = _key.lower())
-    def parse(self, querstring):
+    def parse(self, querystring):
         grouped_actions = ActionGroup()
         self.state_machine.pre_process(grouped_actions)
-
-        for _key, value in querstring.items():
+        for _key, value in querystring:
             key = _key.lower()
             segments = self._segment_key(key)
             segments.append(value)
